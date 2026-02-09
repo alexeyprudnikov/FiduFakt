@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="registration-container">
+        <h1>Starten Sie mit Ihrer E-Rechnungs API</h1>
+        <p>Geben Sie Ihre E-Mail ein. Wir senden Ihnen einen magischen Link zum Einloggen.</p>
+
+        <form method="post">
+            <input type="email" name="email" placeholder="ihre-firma@beispiel.de" required autofocus>
+            <button type="submit">Account erstellen / Login</button>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="admin-container">
+        <h1>Admin Dashboard - System Übersicht</h1>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Nutzer</h3>
+                <p class="value">{{ stats.total_users }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Abos Aktiv</h3>
+                <p class="value">{{ stats.active_subs }}</p>
+            </div>
+            <div class="stat-card">
+                <h3>Rechnungen (Gesamt)</h3>
+                <p class="value">{{ stats.total_invoices }}</p>
+            </div>
+        </div>
+
+        <h2>Nutzer-Liste</h2>
+        <table class="admin-table">
+            <thead>
+            <tr>
+                <th>Email</th>
+                <th>Status</th>
+                <th>Limit</th>
+                <th>Genutzt</th>
+                <th>Stripe ID</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        {% if user.subscription %}
+                            <span class="badge badge-success">Aktiv</span>
+                        {% else %}
+                            <span class="badge badge-gray">Free</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.subscription.invoiceLimit|default(0) }}</td>
+                    <td>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: {{ (user.invoiceCount / (user.subscription.invoiceLimit|default(1)) * 100)|round }}%"></div>
+                        </div>
+                        {{ user.invoiceCount }} Rechnungen
+                    </td>
+                    <td><small>{{ user.stripeCustomerId }}</small></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <style>
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card { background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; }
+        .stat-card .value { font-size: 2rem; font-weight: bold; color: #4f46e5; }
+        .admin-table { width: 100%; border-collapse: collapse; }
+        .admin-table th, .admin-table td { padding: 1rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        .badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+        .badge-success { background: #dcfce7; color: #166534; }
+        .badge-gray { background: #f1f5f9; color: #475569; }
+        .progress-bar { background: #eee; height: 8px; border-radius: 4px; width: 100px; display: inline-block; margin-right: 5px; }
+        .progress-fill { background: #4f46e5; height: 100%; border-radius: 4px; }
+    </style>
+{% endblock %}

@@ -1,0 +1,82 @@
+services:
+  database:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: fidufakt
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: app
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/var/www/html
+    environment:
+      DATABASE_URL: "postgresql://app:password@database:5432/fidufakt?serverVersion=17&charset=utf8"
+      MAILER_DSN: "smtp://mailer:1025"
+    labels:
+        - "ofelia.enabled=true"
+        # Der Job läuft jetzt täglich um 00:00 Uhr
+        - "ofelia.job-exec.reset-quota.schedule=0 0 * * *"
+        - "ofelia.job-exec.reset-quota.command=php bin/console app:reset-quota"
+        # Fehler-Benachrichtigung konfigurieren
+        - "ofelia.job-exec.reset-quota.no-overlap=true"
+    depends_on:
+      - database
+
+  mailer:
+      image: axllent/mailpit
+      ports:
+          - "1025:1025" # SMTP Port
+          - "8025:8025" # Web UI Port
+      restart: unless-stopped
+
+  scheduler:
+      image: mcuadros/ofelia:latest
+      depends_on:
+          - php
+          - mailer
+      volumes:
+          - /var/run/docker.sock:/var/run/docker.sock:ro # Ofelia braucht Zugriff auf Docker
+      # Ofelia Konfiguration via Command-Flags
+      command: daemon --smtp-host=mailer --smtp-port=1025 --smtp-user=app --smtp-from=admin@fidufakt.de --email-to=alexey.prudnikov@yahoo.de
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - .:/var/www/html
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - php
+
+  messenger-worker:
+      build:
+          context: .
+          dockerfile: Dockerfile
+      volumes:
+          - .:/var/www/html
+      environment:
+          DATABASE_URL: "postgresql://app:password@database:5432/fidufakt?serverVersion=17&charset=utf8"
+          MAILER_DSN: "smtp://mailer:1025"
+      # Der Befehl startet den Worker und lässt ihn auf neue Mails warten
+      command: php bin/console messenger:consume async -vv
+      depends_on:
+          - database
+          - mailer
+          - php
+
+volumes:
+  db-data:
+  caddy_data:
+  caddy_config:

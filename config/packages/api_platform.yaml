@@ -1,0 +1,26 @@
+api_platform:
+    title: 'FiduFakt API'
+    description: |
+        Willkommen bei der Fidufakt E-Rechnungs API.
+
+        **Sie benötigen einen API-Key, um Anfragen zu senden.**
+        [Hier kostenlos registrieren und Key erstellen](https://fidufakt.de/register)
+
+        Alle Endpunkte unterstützen das ZUGFeRD 2.2 und XRechnung Format.
+    version: '1.0.0'
+    path_segment_name_generator: 'api_platform.path_segment_name_generator.underscore'
+    defaults:
+        route_prefix: '/v1'
+        url_generation_strategy: !php/const ApiPlatform\Metadata\UrlGeneratorInterface::ABS_URL
+    formats:
+        jsonld: ['application/ld+json']
+        json:   ['application/json']
+        html:   ['text/html']
+    docs_formats:
+        jsonld: ['application/ld+json']
+        html:   ['text/html']
+    swagger:
+        api_keys:
+            apiKey:
+                name: 'X-API-KEY'
+                type: 'header'

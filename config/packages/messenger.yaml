@@ -1,0 +1,14 @@
+framework:
+    messenger:
+        failure_transport: failed
+
+        transports:
+            # Wir nutzen Doctrine (deine Postgres DB) als Warteschlange
+            async: '%env(MESSENGER_TRANSPORT_DSN)%'
+            failed: 'doctrine://default?queue_name=failed'
+
+        routing:
+            # Schicke alle E-Mails in die Warteschlange "async"
+            'Symfony\Component\Mailer\Messenger\SendEmailMessage': async
+            'Symfony\Component\Notifier\Message\ChatMessage': async
+            'Symfony\Component\Notifier\Message\SmsMessage': async

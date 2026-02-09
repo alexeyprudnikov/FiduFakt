@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}FiduFakt - Die E-Rechnungs API für ZUGFeRD & XRechnung{% endblock %}</title>
+        <link rel="icon" href="...">
+        {% block stylesheets %}
+            <script src="https://cdn.tailwindcss.com"></script> {# Falls du Tailwind via CDN nutzt #}
+            <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+        {% endblock %}
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+        {% endblock %}
+    </head>
+    <body class="bg-gray-50 text-gray-900 antialiased">
+    {# NAVIGATION START #}
+    <nav class="bg-white border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center space-x-8">
+                    {# Logo #}
+                    <a href="{{ path(app.user ? 'app_dashboard' : 'index') }}" class="flex items-center space-x-2">
+                        <span class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">F</span>
+                        <span class="text-xl font-bold tracking-tight">FiduFakt</span>
+                    </a>
+
+                    {# Links #}
+                    <div class="hidden md:flex items-center space-x-4">
+                        {% if app.user %}
+                            <a href="{{ path('app_dashboard') }}" class="text-gray-600 hover:text-indigo-600 px-3 py-2 text-sm font-medium">Dashboard</a>
+                        {% endif %}
+
+                        {# API Doku Link - Jetzt für alle sichtbar, da es ein wichtiges Verkaufargument ist #}
+                        <a href="/api/docs" target="_blank" class="text-gray-500 hover:text-indigo-600 px-3 py-2 text-sm font-medium flex items-center border-l border-gray-100 pl-4">
+                            <svg class="w-4 h-4 mr-1.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            API-Doku
+                        </a>
+                    </div>
+                </div>
+
+                <div class="flex items-center space-x-3 md:space-x-6">
+                    {% if app.user %}
+                        <a href="{{ path('app_payment_billing') }}" class="hidden sm:inline-block text-xs font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full transition">Abo verwalten</a>
+                        <a href="{{ path('logout') }}" class="text-sm text-red-500 hover:text-red-700 font-medium">Logout</a>
+                    {% else %}
+                        {# Login als Text-Link #}
+                        <a href="{{ path('login') }}" class="text-sm font-semibold text-gray-600 hover:text-indigo-600 transition">
+                            Login
+                        </a>
+                        {# Registrieren als auffälliger Button #}
+                        <a href="{{ path('register') }}" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition active:scale-95">
+                            Kostenlos starten
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+    {# NAVIGATION END #}
+
+    {# Hier wird der Inhalt aus deinen anderen Templates (z.B. dashboard.html.twig) eingefügt #}
+    <main>
+        {% block body %}{% endblock %}
+    </main>
+
+    <footer class="bg-white border-t border-gray-100 pt-16 pb-8">
+        <div class="max-w-6xl mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-8">
+                <div class="flex items-center space-x-2">
+                    <span class="w-6 h-6 bg-indigo-600 rounded flex items-center justify-center text-white font-bold text-xs">F</span>
+                    <span class="text-lg font-bold tracking-tight text-gray-900">FiduFakt</span>
+                </div>
+
+                <nav class="flex space-x-8 text-sm font-medium text-gray-500">
+                    <a href="#" class="hover:text-indigo-600 transition">Impressum</a>
+                    <a href="#" class="hover:text-indigo-600 transition">Datenschutz</a>
+                    <a href="#" class="hover:text-indigo-600 transition">AGB</a>
+                    <a href="mailto:support@fidufakt.de" class="hover:text-indigo-600 transition">Support</a>
+                </nav>
+
+                <p class="text-sm text-gray-400">
+                    &copy; 2026 FiduFakt. Made in Germany.
+                </p>
+            </div>
+        </div>
+    </footer>
+    </body>
+</html>

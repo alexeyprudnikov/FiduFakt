@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: 'Helvetica', sans-serif; color: #333; line-height: 1.5; padding: 40px; margin: 0; }
+        /* Flexbox durch Float ersetzen */
+        .header { border-bottom: 2px solid #444; padding-bottom: 20px; overflow: hidden; }
+        .header-left { float: left; width: 50%; }
+        .header-right { float: right; width: 50%; text-align: right; }
+        .details-table { width: 100%; border-collapse: collapse; margin-top: 50px; clear: both; }
+        .details-table th { background: #f4f4f4; text-align: left; padding: 10px; border: 1px solid #ddd; }
+        .details-table td { padding: 10px; border: 1px solid #ddd; }
+        .total { font-weight: bold; font-size: 1.2em; text-align: right; margin-top: 20px; }
+        .footer { margin-top: 100px; font-size: 0.8em; color: #777; border-top: 1px solid #ddd; padding-top: 20px; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <div class="header-left">
+        <h1>FIDUFAKT</h1>
+        <p>Ihre digitale Rechnungsfabrik</p>
+    </div>
+    <div class="header-right">
+        <h2>RECHNUNG</h2>
+        <p><strong>Nummer:</strong> {{ invoice.invoiceNumber }}</p>
+        <p><strong>Datum:</strong> {{ invoice.createdAt|date('d.m.Y') }}</p>
+    </div>
+</div>
+
+<table class="details-table">
+    <thead>
+    <tr>
+        <th>Beschreibung</th>
+        <th>Menge</th>
+        <th>Preis (Netto)</th>
+        <th>Gesamt</th>
+    </tr>
+    </thead>
+    <tbody>
+    {# Wir nehmen an, der Payload enthält ein 'items' Array #}
+    {% for item in invoice.rawPayload.items|default([]) %}
+        <tr>
+            <td>{{ item.description }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>{{ item.price|number_format(2, ',', '.') }} €</td>
+            <td>{{ (item.quantity * item.price)|number_format(2, ',', '.') }} €</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="total">
+    Rechnungs-Hash (SHA-256): <br>
+    <small style="font-family: monospace; font-weight: normal;">{{ invoice.payloadHash }}</small>
+</div>
+
+<div class="footer">
+    <p>Diese Rechnung enthält ein eingebettetes ZUGFeRD-XML für die automatisierte Verarbeitung.</p>
+    {% if app.user.subscription is null %}
+        <p><b>FiduFakt Sandbox - Nicht zur Einreichung beim Finanzamt.</b></p>
+    {% endif %}
+</div>
+</body>
+</html>

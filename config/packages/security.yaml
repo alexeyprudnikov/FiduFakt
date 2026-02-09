@@ -1,0 +1,63 @@
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        # Type 1: Die API für die Maschinen der B2B Kunden
+        api:
+            pattern: ^/api/v1
+            stateless: true
+            custom_authenticators:
+                - App\Security\ApiKeyAuthenticator
+
+        # Type 2: Das Dashboard für die Menschen
+        main:
+            lazy: true
+            provider: app_user_provider
+            login_link:
+                check_route: login_check
+                check_post_only: true
+                max_uses: 1
+                signature_properties: [ 'id', 'email' ]
+                lifetime: 900 # Link ist 15 Minuten gültig
+                success_handler: App\Security\AuthenticationSuccessHandler
+            logout:
+                path: logout
+                target: login
+
+    access_control:
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        # API-Dokumentation öffentlich zugänglich machen
+        - { path: ^/api/(docs|contexts)$, roles: PUBLIC_ACCESS }
+        - { path: ^/api$, roles: PUBLIC_ACCESS }
+        # Die eigentliche API-Nutzung (v1) bleibt streng geschützt
+        - { path: ^/api/v1, roles: IS_AUTHENTICATED_FULLY }
+        # Alle anderen Dashboard-Seiten (/app/...) brauchen einen Login
+        - { path: ^/app, roles: ROLE_USER }
+
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+        ROLE_SUPER_ADMIN: [ ROLE_ADMIN ]
+
+when@test:
+    security:
+        password_hashers:
+            # Password hashers are resource-intensive by design to ensure security.
+            # In tests, it's safe to reduce their cost to improve performance.
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon

@@ -1,0 +1,373 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="max-w-6xl mx-auto px-4 py-10 space-y-12">
+
+        {# Header Sektion #}
+        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Willkommen, {{ app.user.email }}</h1>
+                <p class="text-gray-500 mt-1">Verwalte hier deine API-Schnittstellen und dein Abonnement.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <a href="{{ path('app_payment_billing') }}" class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition shadow-sm">
+                    <svg class="w-4 h-4 mr-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+                    Abo & Abrechnung
+                </a>
+            </div>
+        </header>
+
+        <div class="fixed top-5 right-5 z-50 space-y-4">
+            {% for label, messages in app.flashes(['success', 'error']) %}
+                {% for message in messages %}
+                    {# Wir ignorieren hier den 'api_key_success' Flash, da dieser speziell in der Card angezeigt wird #}
+                    {% if label != 'api_key_success' %}
+                        <div x-data="{ show: true }"
+                             x-show="show"
+                             x-init="setTimeout(() => show = false, 5000)"
+                             x-transition:enter="transition ease-out duration-300"
+                             x-transition:enter-start="opacity-0 transform translate-x-8"
+                             x-transition:enter-end="opacity-100 transform translate-x-0"
+                             x-transition:leave="transition ease-in duration-200"
+                             x-transition:leave-start="opacity-100 transform translate-x-0"
+                             x-transition:leave-end="opacity-0 transform translate-x-8"
+                             class="flex items-center p-4 rounded-xl shadow-lg border {{ label == 'success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800' }} min-w-[300px]">
+
+                            <div class="mr-3">
+                                {% if label == 'success' %}
+                                    <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                {% else %}
+                                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                {% endif %}
+                            </div>
+                            <div class="text-sm font-bold leading-none">{{ message }}</div>
+                            <button @click="show = false" class="ml-auto pl-4 text-gray-400 hover:text-gray-600 font-bold">✕</button>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+        {# Quota & Stats Card #}
+        {# 1. Sandbox-Banner (100% Breite) #}
+        {% if app.user.subscription is null %}
+            <div class="w-full bg-indigo-400 rounded-3xl overflow-hidden shadow-lg shadow-indigo-100 mb-8 border-b-4 border-indigo-500">
+                <div class="px-8 py-6 flex flex-col lg:flex-row items-center justify-between gap-6">
+                    <div class="flex items-center">
+                        <div class="relative flex-shrink-0">
+                            {# Der Puls-Effekt funktioniert meistens gut mit opacity-75 #}
+                            <span class="absolute inline-flex h-full w-full rounded-full bg-white opacity-40 animate-ping"></span>
+                            <div class="relative bg-white p-3 rounded-2xl shadow-sm text-indigo-400">
+                                <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="ml-6 text-white text-left">
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-black uppercase tracking-widest bg-white/20 px-2 py-0.5 rounded border border-white/30">Status: Sandbox-Modus</span>
+                            </div>
+                            <h3 class="text-xl font-bold mt-1">API bereit zum Testen</h3>
+                            <p class="text-white/90 text-sm mt-0.5 max-w-2xl leading-relaxed">
+                                Nutze alle Funktionen uneingeschränkt. PDFs enthalten aktuell ein <span class="font-bold underline decoration-white/50 underline-offset-4">Wasserzeichen</span>. Wähle einen Plan für produktive Rechnungen.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0 w-full lg:w-auto">
+                        <a href="#pricing" class="flex items-center justify-center px-8 py-4 bg-white text-indigo-500 font-black rounded-2xl hover:bg-gray-50 transition-all transform hover:scale-[1.02] shadow-xl text-sm uppercase tracking-wider">
+                            Plan aktivieren
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {# 2. Statistik-Sektion #}
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-bold text-gray-800">Aktueller Verbrauch</h3>
+                    <span class="px-3 py-1 text-xs font-bold uppercase rounded-full border {{ app.user.subscription ? 'bg-indigo-50 text-indigo-700 border-indigo-100' : 'bg-gray-100 text-gray-600 border-gray-200' }}">
+                {{ app.user.subscription ? app.user.subscription.planName|capitalize ~ ' Plan' : 'Sandbox (Test)' }}
+            </span>
+                </div>
+
+                {# Dynamische Limits: 20 für Sandbox, sonst Plan-Limit #}
+                {% set limit = app.user.subscription ? app.user.subscription.invoiceLimit : 20 %}
+                {% set percentage = (app.user.invoiceCount / limit * 100)|round %}
+                {% if percentage > 100 %}{% set percentage = 100 %}{% endif %}
+
+                <div class="mb-4 flex justify-between items-end">
+                    <div class="text-4xl font-black text-gray-900">
+                        {{ app.user.invoiceCount }} <span class="text-lg text-gray-400 font-medium">/ {{ limit }}</span>
+                    </div>
+                    <div class="text-sm font-medium {{ percentage > 90 ? 'text-red-600' : 'text-gray-500' }}">
+                        {{ percentage }}% verbraucht
+                    </div>
+                </div>
+
+                <div class="w-full bg-gray-100 rounded-full h-3 mb-8 overflow-hidden">
+                    <div class="h-full rounded-full transition-all duration-700 {{ percentage > 90 ? 'bg-red-500' : 'bg-indigo-600' }}"
+                         style="width: {{ percentage }}%">
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-between items-center bg-gray-50 rounded-xl p-4 border border-gray-100">
+                    <div class="flex items-center text-sm text-gray-600">
+                        <svg class="w-5 h-5 mr-2 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        {% if app.user.subscription %}
+                            <span>Nächster Reset: <strong>{{ app.user.subscription.createdAt|date('d.') }} {{ "now"|date_modify("+1 month")|date("M.") }}</strong></span>
+                        {% else %}
+                            <span>Limit gilt für den <strong>Sandbox-Zeitraum</strong></span>
+                        {% endif %}
+                    </div>
+                    {# Upgrade-Link anzeigen, wenn Limit fast erreicht oder noch im Sandbox-Modus #}
+                    {% if percentage >= 80 or not app.user.subscription %}
+                        <a href="#pricing" class="text-sm font-bold text-indigo-600 hover:underline">
+                            {{ not app.user.subscription ? 'Jetzt Live-Modus freischalten' : 'Jetzt upgraden' }} &rarr;
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Quick Info / Help #}
+            <div class="bg-indigo-700 rounded-2xl shadow-lg p-8 text-white flex flex-col justify-between transform transition hover:scale-[1.01]">
+                <div>
+                    <h3 class="text-xl font-bold mb-3">Dokumentation</h3>
+                    <p class="text-indigo-100 text-sm leading-relaxed">
+                        Integriere FiduFakt in nur 5 Minuten. Nutze unsere <strong>REST-API</strong>, um rechtssichere E-Rechnungen vollautomatisch zu erstellen.
+                    </p>
+                    <div class="mt-4 flex items-center text-xs text-indigo-300">
+                        <span class="flex h-2 w-2 rounded-full bg-green-400 mr-2"></span>
+                        API v1.0 ist online
+                    </div>
+                </div>
+                <a href="/api/docs" target="_blank" class="mt-6 inline-block text-center bg-white text-indigo-700 py-3 rounded-xl font-bold text-sm hover:bg-indigo-50 transition shadow-lg shadow-indigo-900/20">
+                    API-Docs öffnen
+                </a>
+            </div>
+        </section>
+
+        {% for message in app.flashes('api_key_success') %}
+            <div id="api-key-message" x-data="{ open: true }" x-show="open" class="mb-8 bg-amber-50 border-2 border-amber-200 p-6 rounded-2xl shadow-md animate-pulse-once">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 bg-amber-100 p-2 rounded-lg">
+                        <svg class="h-6 w-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <h3 class="text-lg font-bold text-amber-900">Wichtig: Dein neuer API-Key</h3>
+                        <p class="text-sm text-amber-800 mt-1">
+                            Kopiere diesen Key jetzt. Aus Sicherheitsgründen wird er <span class="underline font-bold">nie wieder angezeigt</span>.
+                        </p>
+
+                        <div class="mt-4 flex items-center gap-2">
+                            <code class="bg-white border border-amber-200 px-4 py-3 rounded-lg text-lg font-mono text-gray-900 flex-1 break-all shadow-inner">
+                                {{ message }}
+                            </code>
+
+                            <button @click="navigator.clipboard.writeText('{{ message }}'); $el.innerText = 'Kopiert!'"
+                                    class="bg-amber-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-amber-700 transition-all shadow-sm active:scale-95">
+                                Kopieren
+                            </button>
+                        </div>
+                    </div>
+                    <button @click="open = false" class="text-amber-400 hover:text-amber-600 transition p-1">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+
+        {# API Keys Sektion #}
+        <section class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="p-8 border-b border-gray-100 flex items-center justify-between bg-white">
+                <h2 class="text-xl font-bold text-gray-900">Deine API-Keys</h2>
+                <form action="{{ path('app_api_key_create') }}" method="post">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-lg text-sm font-bold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition shadow-sm">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Neuer Key
+                    </button>
+                </form>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                    <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-widest font-semibold text-nowrap">
+                        <th class="px-8 py-4">Name (Klicken zum Ändern)</th>
+                        <th class="px-8 py-4">Token</th>
+                        <th class="px-8 py-4 text-center">Erstellt</th>
+                        <th class="px-8 py-4">Letzte Nutzung</th>
+                        <th class="px-8 py-4 text-right">Aktion</th>
+                    </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                    {% for key in app.user.apiKeys %}
+                        <tr class="hover:bg-gray-50/50 transition-colors group/row">
+                            {# Name mit Inline-Edit #}
+                            <td class="px-8 py-5" x-data="{ editing: false, name: '{{ key.name|e('js') }}' }">
+                                <div x-show="!editing" @click="editing = true" class="flex items-center cursor-pointer group">
+                                    <span class="font-semibold text-gray-700 border-b border-dashed border-transparent group-hover:border-indigo-300" x-text="name"></span>
+                                    <svg class="w-3.5 h-3.5 ml-2 text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                    </svg>
+                                </div>
+
+                                <form x-show="editing"
+                                      @click.away="editing = false"
+                                      action="{{ path('app_api_key_edit_name', {id: key.id}) }}"
+                                      method="post"
+                                      class="flex items-center gap-2">
+                                    <input type="text"
+                                           name="name"
+                                           x-model="name"
+                                           class="text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500 p-1 px-2 w-full bg-white shadow-inner"
+                                           @keydown.enter="editing = false"
+                                           @keydown.escape="editing = false; name = '{{ key.name|e('js') }}'"
+                                           x-init="$watch('editing', value => value && $nextTick(() => $el.focus()))">
+                                    <button type="submit" class="text-green-600 hover:text-green-800 flex-shrink-0">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    </button>
+                                </form>
+                            </td>
+
+                            {# Token Präfix #}
+                            <td class="px-8 py-5">
+                                <div class="flex items-center font-mono">
+                                    <span class="text-gray-700 font-medium">{{ key.prefix }}</span>
+                                    <span class="text-gray-300 tracking-widest ml-0.5">••••••••</span>
+                                    <span class="ml-2 text-[10px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded uppercase font-sans tracking-normal font-bold">Safe</span>
+                                </div>
+                            </td>
+
+                            {# Erstellt am #}
+                            <td class="px-8 py-5 text-gray-500 text-sm text-center">
+                                {{ key.createdAt|date('d.m.Y') }}
+                            </td>
+
+                            {# Zuletzt verwendet #}
+                            <td class="px-8 py-5 text-sm">
+                                {% if key.lastUsedAt %}
+                                    <div class="flex flex-col">
+                        <span class="text-green-600 font-semibold flex items-center">
+                            <span class="w-1.5 h-1.5 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                            Aktiv
+                        </span>
+                                        <span class="text-gray-400 text-xs">{{ key.lastUsedAt|date('d.m.Y, H:i') }}</span>
+                                    </div>
+                                {% else %}
+                                    <span class="text-gray-300 italic">Nie genutzt</span>
+                                {% endif %}
+                            </td>
+
+                            {# Aktion #}
+                            <td class="px-8 py-5 text-right">
+                                <form action="{{ path('app_api_key_delete', {id: key.id}) }}" method="post" onsubmit="return confirm('Key wirklich löschen?');">
+                                    <button class="text-gray-300 hover:text-red-600 transition-colors p-2 rounded-lg hover:bg-red-50">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="px-8 py-12 text-center">
+                                <div class="flex flex-col items-center">
+                                    <svg class="w-12 h-12 text-gray-200 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                                    <p class="text-gray-400 italic">Noch keine API-Keys erstellt.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        {# Quickstart-Sektion #}
+        {# Wir setzen x-data ganz nach oben an die Section #}
+        <section x-data="{ tab: 'curl' }" class="mt-12 bg-gray-900 rounded-2xl shadow-xl overflow-hidden border border-gray-800">
+            <div class="p-8">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-white">API Quickstart</h3>
+                        <p class="text-gray-400 text-sm mt-1">Teste deine Anbindung sofort mit diesem Beispiel.</p>
+                    </div>
+
+                    {# Buttons: Greifen auf die Variable im Eltern-Element zu #}
+                    <div class="flex bg-gray-800 rounded-lg p-1">
+                        <button @click="tab = 'curl'"
+                                :class="tab === 'curl' ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
+                                class="px-3 py-1 rounded-md text-xs font-bold transition-all duration-200">
+                            cURL
+                        </button>
+                        <button @click="tab = 'php'"
+                                :class="tab === 'php' ? 'bg-indigo-600 text-white shadow-sm' : 'text-gray-400 hover:text-gray-200'"
+                                class="px-3 py-1 rounded-md text-xs font-bold transition-all duration-200 ml-1">
+                            PHP
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative">
+                    {# cURL Beispiel #}
+                    <div x-show="tab === 'curl'"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         class="bg-black/50 rounded-xl p-5 font-mono text-sm text-indigo-300 leading-relaxed overflow-x-auto border border-gray-700">
+                        <span class="text-gray-500"># Teste die Authentifizierung</span><br>
+                        curl -X POST {{ url('api_invoice_generate')|default('https://fidufakt.de/api/v1/invoice/generate') }} \<br>
+                        &nbsp;&nbsp;-H <span class="text-green-400">"X-API-KEY: YOUR_API_KEY"</span> \<br>
+                        &nbsp;&nbsp;-H "Content-Type: application/json" \<br>
+                        &nbsp;&nbsp;-d '{"customer_id": 123, "amount": 49.99}'
+                    </div>
+
+                    {# PHP Beispiel #}
+                    <div x-show="tab === 'php'"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 scale-95"
+                         x-transition:enter-end="opacity-100 scale-100"
+                         class="bg-black/50 rounded-xl p-5 font-mono text-sm text-indigo-300 leading-relaxed overflow-x-auto border border-gray-700"
+                         style="display: none;">
+                        <span class="text-gray-500">// Symfony HttpClient Beispiel</span><br>
+                        $response = $httpClient->request(<span class="text-green-400">'POST'</span>, <span class="text-green-400">'{{ url('api_invoice_generate')|default('https://fidufakt.de/api/v1/invoice/generate') }}'</span>, [<br>
+                        &nbsp;&nbsp;'headers' => [<br>
+                        &nbsp;&nbsp;&nbsp;&nbsp;<span class="text-green-400">'X-API-KEY'</span> => <span class="text-green-400">'YOUR_API_KEY'</span>,<br>
+                        &nbsp;&nbsp;],<br>
+                        &nbsp;&nbsp;'json' => ['customer_id' => 123, 'amount' => 49.99]<br>
+                        ]);
+                    </div>
+
+                    {# Copy Button #}
+                    <button @click="navigator.clipboard.writeText($el.parentElement.querySelector('div[x-show]:not([style*=\'display: none\'])').innerText.replace('Copy', '').trim()); $el.innerText = 'Kopiert!'; setTimeout(() => $el.innerText = 'Copy', 2000)"
+                            class="absolute top-3 right-3 text-xs bg-gray-700 hover:bg-gray-600 text-gray-300 px-2 py-1 rounded transition-colors border border-gray-600">
+                        Copy
+                    </button>
+                </div>
+
+                {# Footer Info #}
+                <div class="mt-6 flex items-center gap-4 text-xs text-gray-500 font-medium">
+            <span class="flex items-center">
+                <span class="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+                POST /api/invoices
+            </span>
+                    <span class="flex items-center">
+                <span class="w-2 h-2 bg-indigo-500 rounded-full mr-2"></span>
+                Auth: X-API-KEY
+            </span>
+                </div>
+            </div>
+        </section>
+
+        {# Pricing Integration: Nur anzeigen, wenn kein Business Plan aktiv ist #}
+        {% if app.user.subscription?.planName != 'business' %}
+            {{ include('components/_pricing_section.html.twig', {
+                is_dashboard: true,
+                user_plan: app.user.subscription ? app.user.subscription.planName : 'free'
+            }) }}
+        {% endif %}
+    </div>
+{% endblock %}

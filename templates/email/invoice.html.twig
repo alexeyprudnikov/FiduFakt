@@ -1,0 +1,5 @@
+<h1>Hallo {{ customerName }},</h1>
+<p>vielen Dank für Ihren Auftrag. Im Anhang finden Sie Ihre Rechnung <strong>{{ invoice.invoiceNumber }}</strong>.</p>
+<p>Bitte begleichen Sie den Betrag bis zum {{ invoice.dueDate|date('d.m.Y') }}.</p>
+<br>
+<p>Mit freundlichen Grüßen,<br>Ihr Team von FiduFakt</p>

@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+html { scroll-behavior: smooth; }
+
+body {
+    background-color: skyblue;
+}
+
+/* Custom Scrollbar für das Code-Fenster */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(31, 41, 55, 0.5); /* gray-800 mit Transparenz */
+    border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(99, 102, 241, 0.3); /* indigo-500 mit Transparenz */
+    border-radius: 10px;
+    border: 2px solid #0d1117; /* Erzeugt einen "Abstand" zum Rand */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(99, 102, 241, 0.6); /* Heller beim Hover */
+}
+
+/* Für Firefox */
+.custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(99, 102, 241, 0.3) rgba(31, 41, 55, 0.5);
+}
