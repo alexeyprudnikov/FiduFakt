@@ -16,6 +16,11 @@ use Symfony\Component\Security\Http\LoginLink\LoginLinkNotification;
 
 class SecurityController extends AbstractController
 {
+    private const array PARAMS = [
+        'hide_nav' => true,
+        'hide_footer' => true
+    ];
+
     #[Route('/register', name: 'register')]
     public function register(
         Request $request,
@@ -43,12 +48,14 @@ class SecurityController extends AbstractController
             );
             $notifier->send($notification, new Recipient($user->email));
 
-            return $this->render('registration/check_email.html.twig', [
-                'email' => $email
-            ]);
+            return $this->render('registration/check_email.html.twig', array_merge(self::PARAMS, ['email' => $email]));
         }
 
-        return $this->render('registration/register.html.twig');
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_dashboard');
+        }
+
+        return $this->render('registration/register.html.twig', self::PARAMS);
     }
 
     #[Route('/login', name: 'login')]
@@ -76,25 +83,32 @@ class SecurityController extends AbstractController
             $recipient = new Recipient($user->email);
             $notifier->send($notification, $recipient);
 
-            return $this->render('security/login_link_sent.html.twig');
+            return $this->render('security/login_link_sent.html.twig', self::PARAMS);
         }
 
-        return $this->render('security/request_login_link.html.twig');
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_dashboard');
+        }
+
+        return $this->render('security/request_login_link.html.twig', self::PARAMS);
     }
 
     #[Route('/login_check', name: 'login_check')]
     public function check(Request $request): Response
     {
+        if ($this->getUser()) {
+            return $this->redirectToRoute('app_dashboard');
+        }
         // get the login link query parameters
         $expires = $request->query->get('expires');
         $username = $request->query->get('user');
         $hash = $request->query->get('hash');
 
         // and render a template with the button
-        return $this->render('security/process_login_link.html.twig', [
+        return $this->render('security/process_login_link.html.twig', array_merge(self::PARAMS, [
             'expires' => $expires,
             'user' => $username,
             'hash' => $hash,
-        ]);
+        ]));
     }
 }

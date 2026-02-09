@@ -1,15 +1,33 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Login bestätigen - FiduFakt{% endblock %}
+
 {% block body %}
-    <h2>Hi! You are about to log in to ...</h2>
+    <div class="min-h-[80vh] flex items-center justify-center px-4 text-center">
+        <div class="max-w-md w-full bg-white p-10 rounded-3xl shadow-2xl border border-gray-50">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-indigo-50 rounded-full text-indigo-400 mb-6">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                </svg>
+            </div>
 
-    <!-- for instance, use a form with hidden fields to
-         create the POST request -->
-    <form action="{{ path('login_check') }}" method="POST">
-        <input type="hidden" name="expires" value="{{ expires }}">
-        <input type="hidden" name="user" value="{{ user }}">
-        <input type="hidden" name="hash" value="{{ hash }}">
+            <h2 class="text-2xl font-black text-gray-900 mb-2 italic">Fast geschafft!</h2>
+            <p class="text-gray-500 text-sm mb-8 leading-relaxed">
+                Klicken Sie auf den Button unten, um Ihre Identität zu bestätigen und zum Dashboard von <strong>FiduFakt</strong> weitergeleitet zu werden.
+            </p>
 
-        <button type="submit">Continue</button>
-    </form>
+            <form action="{{ path('login_check') }}" method="POST">
+                <input type="hidden" name="expires" value="{{ expires }}">
+                <input type="hidden" name="user" value="{{ user }}">
+                <input type="hidden" name="hash" value="{{ hash }}">
+
+                <button type="submit"
+                        class="w-full bg-indigo-400 hover:bg-indigo-500 text-white font-black py-4 rounded-2xl shadow-lg shadow-indigo-100 transition-all transform hover:scale-[1.05] uppercase tracking-wider text-sm">
+                    Sicher anmelden &rarr;
+                </button>
+            </form>
+
+            <p class="mt-6 text-[10px] text-gray-300 uppercase tracking-widest font-bold">Verifiziertes Login-Verfahren</p>
+        </div>
+    </div>
 {% endblock %}

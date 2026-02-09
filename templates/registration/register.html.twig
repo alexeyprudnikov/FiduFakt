@@ -1,13 +1,50 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-    <div class="registration-container">
-        <h1>Starten Sie mit Ihrer E-Rechnungs API</h1>
-        <p>Geben Sie Ihre E-Mail ein. Wir senden Ihnen einen magischen Link zum Einloggen.</p>
+{% block title %}Registrierung - FiduFakt{% endblock %}
 
-        <form method="post">
-            <input type="email" name="email" placeholder="ihre-firma@beispiel.de" required autofocus>
-            <button type="submit">Account erstellen / Login</button>
-        </form>
+{% block body %}
+    <div class="min-h-[80vh] flex items-center justify-center px-4">
+        <div class="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-gray-100 overflow-hidden">
+
+            {# Oberer farbiger Akzent #}
+            <div class="bg-indigo-400 h-2 w-full"></div>
+
+            <div class="p-8 sm:p-12 text-center">
+                {# Logo / Icon #}
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-indigo-50 rounded-2xl text-indigo-500 mb-6">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+
+                <h1 class="text-2xl font-black text-gray-900 mb-3 italic">FiduFakt API</h1>
+                <p class="text-gray-500 text-sm leading-relaxed mb-10">
+                    Starten Sie in 2 Minuten mit Ihrer E-Rechnungs API. Geben Sie Ihre E-Mail ein – wir senden Ihnen einen magischen Link.
+                </p>
+
+                <form method="post" class="space-y-4">
+                    <div class="relative">
+                        <input type="email"
+                               name="email"
+                               placeholder="ihre-firma@beispiel.de"
+                               required
+                               autofocus
+                               class="w-full px-5 py-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-indigo-400 focus:border-transparent transition-all outline-none text-gray-900 placeholder-gray-400 shadow-inner"
+                        >
+                    </div>
+
+                    <button type="submit"
+                            class="w-full bg-indigo-400 hover:bg-indigo-500 text-white font-black py-4 rounded-2xl shadow-lg shadow-indigo-100 transition-all transform hover:scale-[1.02] active:scale-[0.98] uppercase tracking-wider text-sm">
+                        Account erstellen / Login
+                    </button>
+                </form>
+
+                <div class="mt-8 pt-8 border-t border-gray-50">
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">
+                        Kein Passwort nötig • Sicher & Schnell
+                    </p>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

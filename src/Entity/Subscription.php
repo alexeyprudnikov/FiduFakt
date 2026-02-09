@@ -23,7 +23,7 @@ class Subscription
         public string $stripeSubscriptionId,
 
         #[ORM\Column]
-        public int $invoiceLimit = 100,
+        public int $invoiceLimit = 50,
 
         #[ORM\Column]
         public string $planName = 'starter'

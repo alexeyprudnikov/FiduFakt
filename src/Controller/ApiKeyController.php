@@ -26,8 +26,8 @@ class ApiKeyController extends AbstractController
             throw new NotFoundHttpException('Benutzerprofil nicht gefunden.');
         }
 
-        if ($user->subscription === null && $user->apiKeys->count() > 0) {
-            $this->addFlash('error', 'Nur 1 Api-Key im Sandbox-Mode erlaubt.');
+        if (($user->subscription === null || $user->subscription->planName === 'starter') && $user->apiKeys->count() > 0) {
+            $this->addFlash('error', 'Nur ein Api-Key in diesem Paket erlaubt.');
             return $this->redirectToRoute('app_dashboard');
         }
 

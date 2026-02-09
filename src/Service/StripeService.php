@@ -86,7 +86,7 @@ class StripeService
     {
         $session = $this->stripe->billingPortal->sessions->create([
             'customer' => $user->stripeCustomerId,
-            'return_url' => $this->urlGenerator->generate('dashboard', [], UrlGeneratorInterface::ABSOLUTE_URL),
+            'return_url' => $this->urlGenerator->generate('app_dashboard', [], UrlGeneratorInterface::ABSOLUTE_URL),
         ]);
         return $session->url;
     }

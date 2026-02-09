@@ -3,40 +3,41 @@
 {% block title %}E-Mail prüfen - FiduFakt{% endblock %}
 
 {% block body %}
-    <div class="auth-card">
-        <div class="icon-circle">
-            <i class="fas fa-paper-plane"></i>
+    <div class="min-h-[80vh] flex items-center justify-center px-4 text-center">
+        <div class="max-w-md w-full">
+
+            {# Animiertes E-Mail Icon #}
+            <div class="relative inline-block mb-8">
+                <div class="absolute inset-0 bg-indigo-400 rounded-full opacity-20 animate-ping"></div>
+                <div class="relative bg-white p-6 rounded-full shadow-xl border border-gray-50 text-indigo-400">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <h1 class="text-3xl font-black text-gray-900 mb-4">Post ist da!</h1>
+            <p class="text-gray-600 leading-relaxed mb-8">
+                Wir haben einen magischen Link an Ihre E-Mail gesendet. Klicken Sie einfach auf den Link in der E-Mail, um sich sicher einzuloggen.
+            </p>
+
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm inline-block w-full">
+                <h4 class="text-xs font-black text-indigo-400 uppercase tracking-widest mb-2">Nächste Schritte</h4>
+                <ul class="text-sm text-gray-500 space-y-2 text-left px-4">
+                    <li class="flex items-center">
+                        <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 011.414 1.414z"></path></svg>
+                        Posteingang prüfen
+                    </li>
+                    <li class="flex items-center">
+                        <svg class="w-4 h-4 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293l-4 4a1 1 0 01-1.414 0l-2-2a1 1 0 111.414-1.414L9 10.586l3.293-3.293a1 1 0 011.414 1.414z"></path></svg>
+                        Spam-Ordner checken (falls nichts kommt)
+                    </li>
+                </ul>
+            </div>
+
+            <p class="mt-10 text-xs text-gray-400">
+                Das Fenster kann nun geschlossen werden.
+            </p>
         </div>
-
-        <h1>Postfach prüfen!</h1>
-        <p>Wir haben einen magischen Login-Link an <strong>{{ email }}</strong> gesendet.</p>
-
-        <div class="instructions">
-            <p>1. Öffnen Sie Ihre E-Mail-App.<br>
-                2. Klicken Sie auf den Button <strong>"Bei FiduFakt anmelden"</strong>.<br>
-                3. Sie werden automatisch eingeloggt.</p>
-        </div>
-
-        <div class="actions">
-            {# Kleiner UX-Hack: Direkter Link zu gängigen Providern #}
-            {% if 'gmail.com' in email %}
-                <a href="https://mail.google.com" target="_blank" class="btn btn-primary">Gmail öffnen</a>
-            {% elseif 'outlook.' in email or 'hotmail.' in email %}
-                <a href="https://outlook.live.com" target="_blank" class="btn btn-primary">Outlook öffnen</a>
-            {% endif %}
-
-            <a href="{{ path('register') }}" class="btn btn-link">Andere E-Mail verwenden</a>
-        </div>
-
-        <p class="footer-note">Nichts erhalten? Schauen Sie kurz im Spam-Ordner nach.</p>
     </div>
-
-    <style>
-        .auth-card { text-align: center; max-width: 450px; margin: 4rem auto; padding: 2rem; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .icon-circle { font-size: 3rem; color: #4F46E5; margin-bottom: 1rem; }
-        .instructions { background: #f9fafb; padding: 1.5rem; border-radius: 8px; margin: 1.5rem 0; text-align: left; }
-        .btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; margin: 0.5rem; }
-        .btn-primary { background: #4F46E5; color: white; }
-        .btn-link { color: #6b7280; font-size: 0.9rem; }
-    </style>
 {% endblock %}

@@ -1,5 +1,28 @@
 {% extends 'base.html.twig' %}
 
+{% block title %}Link gesendet - FiduFakt{% endblock %}
+
 {% block body %}
-    Login link sent, please check your e-mail.
+    <div class="min-h-[80vh] flex items-center justify-center px-4 text-center">
+        <div class="max-w-md w-full p-8">
+            <div class="relative inline-block mb-8">
+                <div class="absolute inset-0 bg-green-400 rounded-full opacity-20 animate-ping"></div>
+                <div class="relative bg-white p-6 rounded-full shadow-xl border border-gray-50 text-green-500">
+                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 19v-8.93a2 2 0 01.89-1.66l7-4.67a2 2 0 012.22 0l7 4.66a2 2 0 01.89 1.66V19a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 11l9 6 9-6"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <h1 class="text-3xl font-black text-gray-900 mb-4">Link ist unterwegs!</h1>
+            <p class="text-gray-600 mb-8 leading-relaxed">
+                Wir haben Ihnen soeben einen sicheren Zugangsschlüssel per E-Mail geschickt. Er ist für 10 Minuten gültig.
+            </p>
+
+            <a href="/" class="text-sm font-bold text-indigo-400 hover:text-indigo-600 transition">
+                &larr; Zurück zur Startseite
+            </a>
+        </div>
+    </div>
 {% endblock %}

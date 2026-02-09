@@ -1,70 +1,115 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div class="admin-container">
-        <h1>Admin Dashboard - System Übersicht</h1>
+    <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <h3>Nutzer</h3>
-                <p class="value">{{ stats.total_users }}</p>
+            {# Header #}
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+                <div>
+                    <h1 class="text-3xl font-black text-gray-900 tracking-tight">Admin Dashboard</h1>
+                    <p class="text-gray-500 mt-1">System-Übersicht und Nutzerverwaltung</p>
+                </div>
+                <div class="bg-white px-4 py-2 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3">
+                    <span class="flex h-3 w-3 rounded-full bg-green-500 animate-pulse"></span>
+                    <span class="text-sm font-bold text-gray-700">System Live</span>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>Abos Aktiv</h3>
-                <p class="value">{{ stats.active_subs }}</p>
+
+            {# Stats Grid #}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                {# User Stat #}
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-widest">Gesamt Nutzer</p>
+                        <p class="text-4xl font-black text-gray-900 mt-2">{{ stats.total_users }}</p>
+                    </div>
+                    <div class="bg-indigo-50 p-4 rounded-2xl text-indigo-500">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </div>
+                </div>
+
+                {# Subs Stat #}
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-widest">Aktive Abos</p>
+                        <p class="text-4xl font-black text-indigo-600 mt-2">{{ stats.active_subs }}</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-2xl text-green-500">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                </div>
+
+                {# Invoice Stat #}
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-bold text-gray-500 uppercase tracking-widest">Rechnungen</p>
+                        <p class="text-4xl font-black text-gray-900 mt-2">{{ stats.total_invoices }}</p>
+                    </div>
+                    <div class="bg-orange-50 p-4 rounded-2xl text-orange-500">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 2v-6m-9-3H9m12 0h-3.586a1 1 0 01-.707-.293L15.414 4.293a1 1 0 00-.707-.293H10.586a1 1 0 00-.707.293L8.586 5.707a1 1 0 01-.707.293H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2v-11a2 2 0 00-2-2z"></path></svg>
+                    </div>
+                </div>
             </div>
-            <div class="stat-card">
-                <h3>Rechnungen (Gesamt)</h3>
-                <p class="value">{{ stats.total_invoices }}</p>
+
+            {# Nutzer-Liste Table #}
+            <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="px-8 py-6 border-b border-gray-100 flex justify-between items-center">
+                    <h2 class="text-xl font-bold text-gray-800">Nutzer-Liste</h2>
+                    <div class="text-sm text-gray-500">Zeigt die letzten {{ users|length }} Registrierungen</div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                        <tr class="bg-gray-50/50 text-gray-400 text-[11px] uppercase tracking-[0.2em] font-black">
+                            <th class="px-8 py-4">Nutzer / Email</th>
+                            <th class="px-8 py-4">Plan Status</th>
+                            <th class="px-8 py-4 text-center">Limit</th>
+                            <th class="px-8 py-4">Verbrauch</th>
+                            <th class="px-8 py-4">Stripe Info</th>
+                        </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100 text-sm">
+                        {% for user in users %}
+                            <tr class="hover:bg-gray-50/50 transition-colors">
+                                <td class="px-8 py-5 font-bold text-gray-900">{{ user.email }}</td>
+                                <td class="px-8 py-5">
+                                    {% if user.subscription %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                                            {{ user.subscription.planName|default('Aktiv')|upper }}
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-gray-100 text-gray-500">
+                                            SANDBOX
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-8 py-5 text-center font-mono text-gray-500">
+                                    {{ user.subscription.invoiceLimit|default(20) }}
+                                </td>
+                                <td class="px-8 py-5">
+                                    {% set limit = user.subscription.invoiceLimit|default(20) %}
+                                    {% set perc = (user.invoiceCount / limit * 100)|round %}
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex-1 w-24 bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                            <div class="h-full rounded-full {{ perc > 80 ? 'bg-red-500' : 'bg-indigo-500' }}" style="width: {{ perc > 100 ? 100 : perc }}%"></div>
+                                        </div>
+                                        <span class="text-[11px] font-bold {{ perc > 80 ? 'text-red-600' : 'text-gray-600' }}">
+                                            {{ user.invoiceCount }}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-5">
+                                    <code class="text-[10px] bg-gray-50 text-gray-400 px-2 py-1 rounded border border-gray-100">
+                                        {{ user.stripeCustomerId|default('N/A') }}
+                                    </code>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-
-        <h2>Nutzer-Liste</h2>
-        <table class="admin-table">
-            <thead>
-            <tr>
-                <th>Email</th>
-                <th>Status</th>
-                <th>Limit</th>
-                <th>Genutzt</th>
-                <th>Stripe ID</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for user in users %}
-                <tr>
-                    <td>{{ user.email }}</td>
-                    <td>
-                        {% if user.subscription %}
-                            <span class="badge badge-success">Aktiv</span>
-                        {% else %}
-                            <span class="badge badge-gray">Free</span>
-                        {% endif %}
-                    </td>
-                    <td>{{ user.subscription.invoiceLimit|default(0) }}</td>
-                    <td>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width: {{ (user.invoiceCount / (user.subscription.invoiceLimit|default(1)) * 100)|round }}%"></div>
-                        </div>
-                        {{ user.invoiceCount }} Rechnungen
-                    </td>
-                    <td><small>{{ user.stripeCustomerId }}</small></td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
     </div>
-
-    <style>
-        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { background: #f8fafc; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; }
-        .stat-card .value { font-size: 2rem; font-weight: bold; color: #4f46e5; }
-        .admin-table { width: 100%; border-collapse: collapse; }
-        .admin-table th, .admin-table td { padding: 1rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
-        .badge { padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
-        .badge-success { background: #dcfce7; color: #166534; }
-        .badge-gray { background: #f1f5f9; color: #475569; }
-        .progress-bar { background: #eee; height: 8px; border-radius: 4px; width: 100px; display: inline-block; margin-right: 5px; }
-        .progress-fill { background: #4f46e5; height: 100%; border-radius: 4px; }
-    </style>
 {% endblock %}
