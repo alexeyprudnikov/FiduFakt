@@ -15,12 +15,12 @@ readonly class InvoiceStorageService
     public function archiveInvoice(Invoice $invoice, string $pdfContent): void
     {
         $subPath = $invoice->createdAt->format('Y/m');
-        $directory = $this->projectDir . '/var/storage/invoices/' . $subPath;
-        if (!is_dir($directory)) {
-            mkdir($directory, 0775, true);
+        $storageDir = $this->projectDir . "/var/storage/invoices/$subPath";
+        if (!is_dir($storageDir)) {
+            mkdir($storageDir, 0775, true);
         }
         $filename = sprintf('%s_%s.pdf', $invoice->invoiceNumber, $invoice->id->toBase58());
-        $fullPath = $directory . '/' . $filename;
+        $fullPath = $storageDir . '/' . $filename;
         file_put_contents($fullPath, $pdfContent);
         $hash = hash('sha256', $pdfContent);
         $invoice
