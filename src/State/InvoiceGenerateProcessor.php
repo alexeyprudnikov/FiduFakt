@@ -20,7 +20,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
-readonly class InvoiceProcessor implements ProcessorInterface
+readonly class InvoiceGenerateProcessor implements ProcessorInterface
 {
     public function __construct(
         private Security $security,

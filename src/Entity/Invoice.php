@@ -4,18 +4,17 @@ namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\Patch;
-use App\Controller\InvoiceDownloadController;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
-use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
 use App\Controller\InvoicePayController;
 use App\Enum\InvoiceStatus;
 use App\Repository\InvoiceRepository;
-use App\State\InvoiceProcessor;
-use ArrayObject;
+use App\State\InvoiceDownloadProvider;
+use App\State\InvoiceGenerateProcessor;
+use App\State\InvoicePayProcessor;
 use DateMalformedStringException;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
@@ -32,6 +31,9 @@ use Symfony\Component\Uid\Uuid;
             security: "is_granted('INVOICE_VIEW', object)",
             securityMessage: "Dies ist nicht Ihre Rechnung."
         ),
+        new Get(
+            uriTemplate: '/info'
+        ),
         new GetCollection(),
         new Post(
             uriTemplate: '/invoice/generate',
@@ -40,40 +42,21 @@ use Symfony\Component\Uid\Uuid;
                 description: 'Erstellt eine neue E-Rechnung aus JSON-Daten.'
             ),
             name: 'api_invoice_generate',
-            processor: InvoiceProcessor::class,
+            processor: InvoiceGenerateProcessor::class,
         ),
         new Get(
             uriTemplate: '/invoice/{id}/download',
-            controller: InvoiceDownloadController::class,
             openapi: new OpenApiOperation(
-                responses: [
-                    '200' => new OpenApiResponse(
-                        description: 'Das generierte PDF-Dokument inkl. ZUGFeRD-XML',
-                        content: new ArrayObject([
-                            'application/pdf' => [
-                                'schema' => [
-                                    'type' => 'string',
-                                    'format' => 'binary'
-                                ]
-                            ]
-                        ])
-                    )
-                ],
                 summary: 'Lädt die archivierte oder generierte ZUGFeRD-Rechnung herunter'
             ),
-            security: "is_granted('INVOICE_VIEW', object)",
-            securityMessage: "Dies ist nicht Ihre Rechnung.",
-            read: true,
-            serialize: false, // Wichtig: Symfony Controller übernimmt das Response-Handling
-            name: 'api_invoice_download'
+            name: 'api_invoice_download',
+            provider: InvoiceDownloadProvider::class
         ),
         new Patch(
             uriTemplate: '/invoice/{id}/pay',
-            controller: InvoicePayController::class,
-            security: "is_granted('INVOICE_PATCH', object)",
-            read: false,
-            serialize: false, // Wichtig: Symfony Controller übernimmt das Response-Handling
-            name: 'api_invoice_pay'
+            inputFormats: ['json' => ['application/json']],
+            name: 'api_invoice_pay',
+            processor: InvoicePayProcessor::class
         )
     ],
     normalizationContext: ['groups' => ['invoice:read']],
@@ -156,11 +139,6 @@ class Invoice
         ]
     ]])]
     public array $rawPayload = [];
-
-    #[Groups(['invoice:read'])]
-    public string $downloadUrl {
-        get => "/api/invoices/{$this->id}/download?token={$this->fileHash}";
-    }
 
     /**
      * @throws DateMalformedStringException
