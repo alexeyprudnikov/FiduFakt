@@ -26,8 +26,13 @@ class ApiKeyController extends AbstractController
             throw new NotFoundHttpException('Benutzerprofil nicht gefunden.');
         }
 
-        if (($user->subscription === null || $user->subscription->planName === 'starter') && $user->apiKeys->count() > 0) {
-            $this->addFlash('error', 'Nur ein Api-Key in diesem Paket erlaubt.');
+        $maxCount = match (true) {
+            ($user->subscription === null || $user->subscription->planName === 'starter') => 1,
+            default => 5
+        };
+
+        if ($user->apiKeys->count() === $maxCount) {
+            $this->addFlash('error', "In diesem Paket maximal $maxCount ApiKey(s) erlaubt.");
             return $this->redirectToRoute('app_dashboard');
         }
 
