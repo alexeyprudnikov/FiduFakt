@@ -9,7 +9,6 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
-use App\Controller\InvoicePayController;
 use App\Enum\InvoiceStatus;
 use App\Repository\InvoiceRepository;
 use App\State\InvoiceDownloadProvider;
@@ -22,6 +21,7 @@ use Doctrine\ORM\Mapping as ORM;
 use JsonException;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
@@ -175,5 +175,20 @@ class Invoice
     {
         $this->pdfPath = $path;
         return $this;
+    }
+
+    #[Groups(['invoice:read'])]
+    #[SerializedName('totalAmount')]
+    public function getTotalAmount(): float
+    {
+        $total = 0.0;
+        if (isset($this->rawPayload['items']) && is_array($this->rawPayload['items'])) {
+            foreach ($this->rawPayload['items'] as $item) {
+                $lineTotal = (float)($item['price'] ?? 0) * (float)($item['quantity'] ?? 1);
+                $total += $lineTotal;
+            }
+        }
+
+        return $total;
     }
 }

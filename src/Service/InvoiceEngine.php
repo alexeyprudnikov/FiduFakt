@@ -109,10 +109,7 @@ class InvoiceEngine
         }
         $cii->supplyChainTradeTransaction->applicableHeaderTradeAgreement->buyerTradeParty = $buyer;
 
-        // Rechnungsposten Loop
-        $totalNet = 0.0;
         $items = $invoice->rawPayload['items'] ?? [];
-
         foreach ($items as $index => $itemData) {
             $lineItem = new SupplyChainTradeLineItem();
 
@@ -142,7 +139,6 @@ class InvoiceEngine
             // Zeilensumme & Steuern
             $lineItem->specifiedLineTradeSettlement = new LineTradeSettlement();
             $lineTotal = (float)($itemData['quantity'] ?? 1) * $netPrice;
-            $totalNet += $lineTotal;
 
             $lineItem->specifiedLineTradeSettlement->monetarySummation = TradeSettlementLineMonetarySummation::create(
                 number_format($lineTotal, 2, '.', '')
@@ -189,6 +185,7 @@ class InvoiceEngine
         );
         $headerSettlement->specifiedTradePaymentTerms[] = $terms;
 
+        $totalNet = $invoice->getTotalAmount();
         // Globale Steuersumme (Pflicht für EN 16931)
         $taxAmount = $totalNet * 0.19;
         $headerTax = TradeTax::create(
