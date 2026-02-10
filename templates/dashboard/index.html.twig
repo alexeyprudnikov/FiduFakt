@@ -362,8 +362,49 @@
             </div>
         </section>
 
+        {# FINANZ-ÜBERSICHT SEKTION #}
+        <section id="stats" class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {# Box: Offene Forderungen #}
+            <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm flex items-center justify-between group hover:border-amber-200 transition-colors">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="flex h-2 w-2 rounded-full bg-amber-500"></span>
+                        <p class="text-[11px] font-black uppercase text-gray-400 tracking-widest">Offen ({{ invoiceStats.open_count }})</p>
+                    </div>
+                    <h3 class="text-3xl font-black text-gray-900 italic tracking-tight">
+                        {{ invoiceStats.open_amount|number_format(2, ',', '.') }} <span class="text-lg font-bold text-gray-400">€</span>
+                    </h3>
+                    <p class="text-[10px] text-amber-600 font-bold mt-2 bg-amber-50 inline-block px-2 py-0.5 rounded-md">Wartet auf Zahlung</p>
+                </div>
+                <div class="bg-amber-50 p-4 rounded-2xl text-amber-500 group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            {# Box: Einnahmen #}
+            <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm flex items-center justify-between group hover:border-green-200 transition-colors">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="flex h-2 w-2 rounded-full bg-green-500"></span>
+                        <p class="text-[11px] font-black uppercase text-gray-400 tracking-widest">Eingenommen</p>
+                    </div>
+                    <h3 class="text-3xl font-black text-gray-900 italic tracking-tight">
+                        {{ invoiceStats.paid_amount|number_format(2, ',', '.') }} <span class="text-lg font-bold text-gray-400">€</span>
+                    </h3>
+                    <p class="text-[10px] text-green-600 font-bold mt-2 bg-green-50 inline-block px-2 py-0.5 rounded-md">Erfolgreich abgerechnet</p>
+                </div>
+                <div class="bg-green-50 p-4 rounded-2xl text-green-500 group-hover:scale-110 transition-transform">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
         {# RECHNUNGS-VORSCHAU IM DASHBOARD (LATEST 5) #}
-        <section id="lastActivities" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-visible">
+        <section class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-visible">
             <div class="p-8 border-b border-gray-100 flex items-center justify-between">
                 <div>
                     <h2 class="text-xl font-black text-gray-900 tracking-tight">Letzte Aktivitäten</h2>

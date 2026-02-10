@@ -46,7 +46,7 @@
 
                         <div class="flex items-center space-x-3 md:space-x-6">
                             {% if app.user %}
-                                <a href="{{ path('app_dashboard', {'_fragment': 'lastActivities'}) }}" class="hidden sm:inline-block text-xs font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full transition">Letzte Aktivitäten</a>
+                                <a href="{{ path('app_dashboard', {'_fragment': 'stats'}) }}" class="hidden sm:inline-block text-xs font-semibold text-gray-500 hover:text-gray-700 bg-gray-100 px-3 py-1.5 rounded-full transition">Statistik</a>
                                 <a href="{{ path('logout') }}" class="text-sm text-red-500 hover:text-red-700 font-medium">Logout</a>
                             {% else %}
                                 {# Login als Text-Link #}

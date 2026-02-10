@@ -32,8 +32,12 @@ class DashboardController extends AbstractController
     ): Response
     {
         $user = $this->userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+        if (!($user instanceof User)) {
+            throw $this->createAccessDeniedException();
+        }
         return $this->render('dashboard/index.html.twig', [
-            'latestInvoices' => ($user instanceof User)  ? $invoiceRepository->findLatestByUser($user) : [],
+            'latestInvoices' => $invoiceRepository->findLatestByUser($user),
+            'invoiceStats' => $invoiceRepository->getStatsByUser($user),
         ]);
     }
 
