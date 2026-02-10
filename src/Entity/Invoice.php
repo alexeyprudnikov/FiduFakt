@@ -9,8 +9,10 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation as OpenApiOperation;
+use ApiPlatform\OpenApi\Model\Response as OpenApiResponse;
 use App\Enum\InvoiceStatus;
 use App\Repository\InvoiceRepository;
+use App\State\InfoProvider;
 use App\State\InvoiceDownloadProvider;
 use App\State\InvoiceGenerateProcessor;
 use App\State\InvoicePayProcessor;
@@ -23,22 +25,58 @@ use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\SerializedName;
 use Symfony\Component\Uid\Uuid;
+use ArrayObject;
 
 #[ORM\Entity(repositoryClass: InvoiceRepository::class)]
 #[ApiResource(
     operations: [
         new Get(
+            uriTemplate: '/info',
+            openapi: new OpenApiOperation(
+                responses: [
+                    '200' => new OpenApiResponse(
+                        content: new ArrayObject([
+                            'application/json' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'message' => ['type' => 'string'],
+                                        'user' => ['type' => 'string']
+                                    ]
+                                ],
+                                'example' => [
+                                    'message' => 'Willkommen bei FiduFakt',
+                                    'user' => 'max.musterman@test.de',
+                                ]
+                            ]
+                        ])
+                    )
+                ],
+                summary: 'Info.',
+                description: 'API Informationen ansehen.'
+            ),
+            name: 'api_info',
+            provider: InfoProvider::class
+        ),
+        new Get(
+            openapi: new OpenApiOperation(
+                summary: 'Rechnung.',
+                description: 'Rechnung ansehen.'
+            ),
             security: "is_granted('INVOICE_VIEW', object)",
             securityMessage: "Dies ist nicht Ihre Rechnung."
         ),
-        new Get(
-            uriTemplate: '/info'
+        new GetCollection(
+            // todo: show only own invoices
+            openapi: new OpenApiOperation(
+                summary: 'Alle Rechnungen.',
+                description: 'Alle Rechnungen ansehen.'
+            ),
         ),
-        new GetCollection(),
         new Post(
             uriTemplate: '/invoice/generate',
             openapi: new OpenApiOperation(
-                summary: 'Rechnung generieren',
+                summary: 'Rechnung generieren.',
                 description: 'Erstellt eine neue E-Rechnung aus JSON-Daten.'
             ),
             name: 'api_invoice_generate',
@@ -47,7 +85,8 @@ use Symfony\Component\Uid\Uuid;
         new Get(
             uriTemplate: '/invoice/{id}/download',
             openapi: new OpenApiOperation(
-                summary: 'Lädt die archivierte oder generierte ZUGFeRD-Rechnung herunter'
+                summary: 'Rechnung herunterladen.',
+                description: 'Lädt die archivierte oder generierte ZUGFeRD-Rechnung herunter.'
             ),
             name: 'api_invoice_download',
             provider: InvoiceDownloadProvider::class
@@ -55,6 +94,10 @@ use Symfony\Component\Uid\Uuid;
         new Patch(
             uriTemplate: '/invoice/{id}/pay',
             inputFormats: ['json' => ['application/json']],
+            openapi: new OpenApiOperation(
+                summary: 'Rechnung bezahlt.',
+                description: 'Rechnung als bezahlt markieren.'
+            ),
             name: 'api_invoice_pay',
             processor: InvoicePayProcessor::class
         )
@@ -121,7 +164,7 @@ class Invoice
             'postCode' => '12345',
             'city' => 'Berlin',
             'countryCode' => 'DE',
-            'email' => 'max.mustermann@test-email.de',
+            'email' => 'max.mustermann@test.de',
             'phone' => '+491791234567',
             'vatId' => '122/34/56'
         ],

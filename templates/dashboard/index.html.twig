@@ -184,14 +184,19 @@
         <section class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             <div class="p-8 border-b border-gray-100 flex items-center justify-between bg-white">
                 <h2 class="text-xl font-bold text-gray-900">Deine API-Keys</h2>
-                <div class="relative flex items-center" x-data="{ showLimitHint: false }">
-                    {# Hinweis-Label, falls Limit erreicht #}
+                <div class="relative flex items-center"
+                     x-data="{ showLimitHint: false }"
+                     @mouseleave="showLimitHint = false">
                     {% if app.user.isKeyLimitReached %}
-                        <span x-show="showLimitHint"
-                              x-transition
-                              class="absolute right-full mr-3 px-3 py-1 bg-amber-50 border border-amber-200 text-amber-700 text-[10px] font-bold rounded-lg shadow-sm whitespace-nowrap">
-                            In diesem Paket maximal {{ app.user.keyLimit }} {{ app.user.keyLimit == 1 ? 'ApiKey' : 'ApiKeys' }} erlaubt.
-                        </span>
+                        <div x-show="showLimitHint"
+                             x-transition
+                            {# mouseenter hier sorgt dafür, dass er offen bleibt, wenn man drüberfährt #}
+                             @mouseenter="showLimitHint = true"
+                             class="absolute right-full mr-3 px-3 py-1.5 bg-indigo-50 border border-indigo-200 text-indigo-700 text-[10px] font-bold uppercase rounded-lg shadow-sm whitespace-nowrap z-10">
+                            Limit erreicht | <a href="#pricing" class="underline hover:text-indigo-900 ml-1">Jetzt upgraden</a>
+                            {# Kleiner unsichtbarer Puffer, damit die Maus beim Wechsel nicht den Kontakt verliert #}
+                            <div class="absolute -right-3 top-0 h-full w-3"></div>
+                        </div>
                     {% endif %}
 
                     <form action="{{ path('app_api_key_create') }}" method="post">
@@ -199,7 +204,6 @@
                             {% if app.user.isKeyLimitReached %}
                                 disabled
                                 @mouseenter="showLimitHint = true"
-                                @mouseleave="showLimitHint = false"
                             {% endif %}
                                 class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-bold transition shadow-sm
                                 {{ app.user.isKeyLimitReached
