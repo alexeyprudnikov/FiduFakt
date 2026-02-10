@@ -77,4 +77,14 @@ class User implements UserInterface
     {
         return $this->invoiceCount < ($this->subscription?->invoiceLimit ?? self::INVOICE_COUNT_DEFAULT);
     }
+
+    public function getKeyLimit(): int
+    {
+        return ($this->subscription === null || $this->subscription->planName === 'starter') ? 1 : 5;
+    }
+
+    public function isKeyLimitReached(): bool
+    {
+        return $this->apiKeys->count() >= $this->getKeyLimit();
+    }
 }

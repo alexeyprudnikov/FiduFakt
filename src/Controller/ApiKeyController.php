@@ -9,8 +9,8 @@ use Random\RandomException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 #[Route('/app/api-key', name: 'app_api_key_')]
 class ApiKeyController extends AbstractController
@@ -23,17 +23,11 @@ class ApiKeyController extends AbstractController
     {
         $user = $em->getRepository(User::class)->findOneBy(['email' => $this->getUser()?->getUserIdentifier()]);
         if (!($user instanceof User)) {
-            throw new NotFoundHttpException('Benutzerprofil nicht gefunden.');
+            throw new AccessDeniedException('Benutzerprofil nicht gefunden.');
         }
 
-        $maxCount = match (true) {
-            ($user->subscription === null || $user->subscription->planName === 'starter') => 1,
-            default => 5
-        };
-
-        if ($user->apiKeys->count() === $maxCount) {
-            $this->addFlash('error', "In diesem Paket maximal $maxCount ApiKey(s) erlaubt.");
-            return $this->redirectToRoute('app_dashboard');
+        if ($user->isKeyLimitReached()) {
+            throw new AccessDeniedException("In diesem Paket maximal {$user->getKeyLimit()} ApiKey(s) erlaubt.");
         }
 
         // 1. Key im Controller generieren
@@ -61,8 +55,7 @@ class ApiKeyController extends AbstractController
     ): Response
     {
         if ($apiKey->user?->getUserIdentifier() !== $this->getUser()?->getUserIdentifier()) {
-            $this->addFlash('error', 'Zugriff verweigert.');
-            return $this->redirectToRoute('app_dashboard');
+            throw new AccessDeniedException();
         }
         $name = $apiKey->name;
         $em->remove($apiKey);
@@ -80,8 +73,7 @@ class ApiKeyController extends AbstractController
         EntityManagerInterface $em
     ): Response {
         if ($apiKey->user?->getUserIdentifier() !== $this->getUser()?->getUserIdentifier()) {
-            $this->addFlash('error', 'Zugriff verweigert.');
-            return $this->redirectToRoute('app_dashboard');
+            throw new AccessDeniedException();
         }
         $newName = $request->request->get('name');
         if ($newName && $newName !== $apiKey->name) {
