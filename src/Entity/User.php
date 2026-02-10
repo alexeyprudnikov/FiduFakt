@@ -41,7 +41,7 @@ class User implements UserInterface
             orphanRemoval: true,
         ),
     ]
-    #[ORM\OrderBy(["invoiceNumber" => "DESC"])]
+    #[ORM\OrderBy(["createdAt" => "DESC"])]
     public Collection $invoices;
 
     #[ORM\OneToOne(targetEntity: Subscription::class, mappedBy: 'user', cascade: ['persist', 'remove'])]

@@ -1,0 +1,81 @@
+<table class="w-full text-left border-collapse">
+    <thead>
+    <tr class="bg-gray-50/50 text-gray-400 text-[11px] uppercase tracking-widest font-black">
+        <th class="px-8 py-4">Datum / Nummer</th>
+        <th class="px-8 py-4">Empfänger</th>
+        <th class="px-8 py-4">Betrag (Brutto)</th>
+        <th class="px-8 py-4">Status</th>
+        <th class="px-8 py-4 text-right">Aktion</th>
+    </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-100">
+    {% for invoice in invoices %}
+        <tr class="hover:bg-gray-50/50 transition-colors group">
+            <td class="px-8 py-5">
+                <div class="text-sm font-bold text-gray-900">{{ invoice.createdAt|date('d.m.Y') }}</div>
+                <div class="text-[10px] text-gray-400 font-mono mt-0.5 tracking-tight">#{{ invoice.invoiceNumber }}</div>
+            </td>
+            <td class="px-8 py-5">
+                {# Zugriff auf rawPayload['customer']['name'] #}
+                <div class="text-sm text-gray-700 font-medium">
+                    {{ invoice.rawPayload.customer.name|default('Kein Name') }}
+                </div>
+                <div class="text-[10px] text-gray-400">
+                    {{ invoice.rawPayload.customer.city|default('-') }}
+                </div>
+            </td>
+            <td class="px-8 py-5">
+                <div class="text-sm font-black text-gray-900">
+                    {{ invoice.totalAmount|number_format(2, ',', '.') }} €
+                </div>
+            </td>
+            <td class="px-8 py-5">
+                {# Prüfung gegen den Enum Backing Value (z.B. 'paid') #}
+                {% if invoice.status.value == 'paid' %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black bg-green-100 text-green-700 uppercase">Bezahlt</span>
+                {% else %}
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-700 uppercase">Offen</span>
+                {% endif %}
+            </td>
+            <td class="px-8 py-5 text-right flex justify-end items-center gap-3">
+                {# Download Icon-Button mit Tooltip (Rechtsbündig) #}
+                <div x-data="{ tooltip: false }" class="relative inline-flex items-center">
+                    <a href="{{ path('app_invoice_download', {'id': invoice.id }) }}"
+                       target="_blank"
+                       @mouseenter="tooltip = true"
+                       @mouseleave="tooltip = false"
+                       @click="tooltip = false"
+                       class="inline-flex items-center justify-center p-2.5 bg-indigo-50 text-indigo-600 hover:bg-indigo-600 hover:text-white rounded-xl transition-all duration-200 border border-indigo-100 shadow-sm group"
+                    >
+                        <svg class="w-5 h-5 transition-transform group-hover:-translate-y-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                    </a>
+
+                    {# Tooltip Box - Jetzt nach rechts ausgerichtet (right-0) #}
+                    <div x-show="tooltip"
+                         x-transition:enter="transition ease-out duration-200"
+                         x-transition:enter-start="opacity-0 transform translate-y-1"
+                         x-transition:enter-end="opacity-100 transform translate-y-0"
+                         x-transition:leave="transition ease-in duration-150"
+                         x-transition:leave-start="opacity-100 transform translate-y-0"
+                         x-transition:leave-end="opacity-0 transform translate-y-1"
+                         class="absolute bottom-full mb-3 right-0 z-50 px-3 py-1.5 bg-gray-900 text-white text-[10px] font-bold rounded-lg shadow-xl whitespace-nowrap pointer-events-none"
+                         style="display: none;"
+                    >
+                        ZUGFeRD PDF/XML laden
+                        {# Tooltip Pfeil - Jetzt ebenfalls rechts positioniert #}
+                        <div class="absolute top-full right-3 border-4 border-transparent border-t-gray-900"></div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    {% else %}
+        <tr>
+            <td colspan="5" class="px-8 py-10 text-center text-gray-400 text-sm italic">
+                Noch keine Rechnungen generiert.
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

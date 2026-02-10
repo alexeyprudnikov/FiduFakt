@@ -362,6 +362,29 @@
             </div>
         </section>
 
+        {# RECHNUNGS-VORSCHAU IM DASHBOARD (LATEST 5) #}
+        <section id="lastActivities" class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-visible">
+            <div class="p-8 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-black text-gray-900 tracking-tight">Letzte Aktivitäten</h2>
+                    <p class="text-sm text-gray-500 mt-1">Deine aktuellsten API-Transaktionen auf einen Blick.</p>
+                </div>
+                <a href="{{ path('app_invoices') }}" class="group text-sm font-bold text-indigo-500 flex items-center transition-colors hover:text-indigo-700">
+                    Alle Rechnungen
+                    <svg class="w-4 h-4 ml-1.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <div class="overflow-x-auto">
+                {# letzte Rechnungen-Liste #}
+                {{ include('components/_invoices_table.html.twig', {
+                    invoices: latestInvoices
+                }) }}
+            </div>
+        </section>
+
         {# Pricing Integration: Nur anzeigen, wenn kein Business Plan aktiv ist #}
         {% if app.user.subscription?.planName != 'business' %}
             {{ include('components/_pricing_section.html.twig', {

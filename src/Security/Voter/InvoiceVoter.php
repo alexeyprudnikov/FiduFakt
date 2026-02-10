@@ -42,6 +42,6 @@ class InvoiceVoter extends Voter
 
     private function canView(Invoice $invoice, UserInterface $user): bool
     {
-        return $invoice->user?->email === $user->getUserIdentifier();
+        return $invoice->user?->getUserIdentifier() === $user->getUserIdentifier();
     }
 }
