@@ -18,6 +18,7 @@ RUN apt-get update && apt-get install -y \
         xsl \
         opcache
 
+COPY ./docker-php-config.ini /usr/local/etc/php/conf.d/app-php-config.ini
 # Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 

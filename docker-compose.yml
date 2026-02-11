@@ -42,9 +42,16 @@ services:
           - php
           - mailer
       volumes:
-          - /var/run/docker.sock:/var/run/docker.sock:ro # Ofelia braucht Zugriff auf Docker
-      # Ofelia Konfiguration via Command-Flags
-      command: daemon --smtp-host=mailer --smtp-port=1025 --smtp-user=app --smtp-from=admin@fidufakt.de --email-to=alexey.prudnikov@yahoo.de
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+      command: daemon --docker
+      labels:
+          # Globale SMTP Einstellungen für ALLE Jobs
+          - "ofelia.global.smtp-host=mailer"
+          - "ofelia.global.smtp-port=1025"
+          - "ofelia.global.smtp-from=admin@fidufakt.de"
+          - "ofelia.global.email-to=admin@fidufakt.de"
+          # Optional: Nur bei Fehlern senden
+          - "ofelia.global.mail-only-on-error=true"
 
   caddy:
     image: caddy:2-alpine
@@ -69,8 +76,10 @@ services:
       environment:
           DATABASE_URL: "postgresql://app:password@database:5432/fidufakt?serverVersion=17&charset=utf8"
           MAILER_DSN: "smtp://mailer:1025"
+          APP_ENV: prod
+          APP_DEBUG: 0
       # Der Befehl startet den Worker und lässt ihn auf neue Mails warten
-      command: php bin/console messenger:consume async -vv
+      command: php bin/console messenger:consume async --memory-limit=384M -vv
       depends_on:
           - database
           - mailer
