@@ -25,7 +25,7 @@ readonly class InvoiceDownloadProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): Response
     {
         $invoice = $this->itemProvider->provide($operation, $uriVariables, $context);
-        $pdfContent = $this->invoiceDownloadService->getPdfContent($invoice);
+        $pdfContent = $this->invoiceDownloadService->getPdfContent($invoice, 'api');
         return new Response($pdfContent, 200, [
             'Content-Type' => 'application/pdf',
             // 'inline' statt 'attachment' öffnet das PDF oft direkt im Browser-Tab,

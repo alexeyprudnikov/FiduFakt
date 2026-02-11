@@ -28,7 +28,7 @@ readonly class InvoiceDownloadService
      * @throws RuntimeError
      * @throws LoaderError
      */
-    public function getPdfContent(Invoice $invoice): string
+    public function getPdfContent(Invoice $invoice, string $source = 'app'): string
     {
         $securityUser = $this->security->getUser();
         if ($securityUser->getUserIdentifier() !== $invoice->user?->getUserIdentifier()) {
@@ -39,7 +39,8 @@ readonly class InvoiceDownloadService
             userIdentifier: $securityUser?->getUserIdentifier() ?? 'anonymous',
             context: [
                 'invoice_id' => $invoice->id->toString(),
-                'invoice_number' => $invoice->invoiceNumber
+                'invoice_number' => $invoice->invoiceNumber,
+                'source' => $source,
             ]
         );
 
